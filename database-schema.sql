@@ -10,12 +10,33 @@ create table if not exists public.tasks (
 );
 
 -- Enable Row Level Security (RLS)
-alter table public.tasks enable row level security;
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
--- Create a policy that allows all operations for now
--- Note: In a real app, you'd want to restrict this to authenticated users
-create policy "Allow all operations on tasks" on public.tasks
-for all using (true);
+-- Create policy to allow users to only see their own tasks
+CREATE POLICY "Users can view own tasks" ON tasks
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Create policy to allow users to insert their own tasks
+CREATE POLICY "Users can insert own tasks" ON tasks
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Create policy to allow users to update their own tasks
+CREATE POLICY "Users can update own tasks" ON tasks
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create policy to allow users to delete their own tasks
+CREATE POLICY "Users can delete own tasks" ON tasks
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Add user_id column to tasks table if it doesn't exist
+-- (This should already be done in Supabase dashboard)
+-- ALTER TABLE tasks ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id);
+
+-- Create index for better performance on user_id queries
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);
+
+-- Create index for better performance on user_id + created_at queries
+CREATE INDEX IF NOT EXISTS idx_tasks_user_created ON tasks(user_id, created_at DESC);
 
 -- Create an index on created_at for better performance when ordering
 create index if not exists tasks_created_at_idx on public.tasks (created_at desc);

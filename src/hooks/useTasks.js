@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
-  // Fetch all tasks
+  // Fetch user-specific tasks
   const fetchTasks = async () => {
+    if (!user) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -28,12 +37,17 @@ export const useTasks = () => {
 
   // Add a new task
   const addTask = async (taskData) => {
+    if (!user) {
+      throw new Error('User must be authenticated to add tasks');
+    }
+
     try {
       const newTask = {
         title: taskData.title,
         time_limit: taskData.timeLimit ? new Date(Date.now() + taskData.timeLimit * 60 * 1000).toISOString() : null,
         completed: false,
-        has_expired: false
+        has_expired: false,
+        user_id: user.id
       };
 
       const { data, error } = await supabase
@@ -111,11 +125,20 @@ export const useTasks = () => {
   useEffect(() => {
     fetchTasks();
 
-    // Subscribe to real-time changes
+    if (!user) {
+      return;
+    }
+
+    // Subscribe to real-time changes for user-specific tasks
     const subscription = supabase
-      .channel('tasks')
+      .channel(`tasks-${user.id}`)
       .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'tasks' },
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'tasks',
+          filter: `user_id=eq.${user.id}`
+        },
         (payload) => {
           if (payload.eventType === 'INSERT') {
             setTasks(prev => [payload.new, ...prev]);
@@ -133,7 +156,7 @@ export const useTasks = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [user]);
 
   return {
     tasks,

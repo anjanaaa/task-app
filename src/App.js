@@ -3,12 +3,15 @@ import './App.css';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import Notification from './components/Notification';
+import Login from './components/Login';
 import { useTasks } from './hooks/useTasks';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
+  const { user, loading: authLoading, signOut } = useAuth();
   const { 
     tasks, 
-    loading, 
+    loading: tasksLoading, 
     error, 
     addTask: addTaskToDb, 
     toggleTask: toggleTaskInDb, 
@@ -108,15 +111,21 @@ function App() {
     return () => clearInterval(interval);
   }, [tasks, expiredTasks, handleTaskExpired]);
 
-  if (loading) {
+  // Show loading state while checking authentication
+  if (authLoading) {
     return (
       <div className="App">
         <header className="App-header">
           <h1>Tasks Manager</h1>
-          <p>Loading your tasks...</p>
+          <p>Loading...</p>
         </header>
       </div>
     );
+  }
+
+  // Show login if not authenticated
+  if (!user) {
+    return <Login />;
   }
 
   if (error) {
@@ -131,11 +140,35 @@ function App() {
     );
   }
 
+  if (tasksLoading) {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1>Tasks Manager</h1>
+          <p>Loading your tasks...</p>
+        </header>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Tasks Manager</h1>
-        <p>Add tasks with optional time limits and track your progress</p>
+        <div className="header-content">
+          <div className="header-left">
+            <h1>Tasks Manager</h1>
+            <p>Add tasks with optional time limits and track your progress</p>
+          </div>
+          <div className="header-right">
+            <div className="user-info">
+              <span className="user-avatar">👤</span>
+              <span className="user-email">{user.email}</span>
+            </div>
+            <button className="signout-btn" onClick={signOut}>
+              Sign Out
+            </button>
+          </div>
+        </div>
       </header>
       
       <main className="App-main">
