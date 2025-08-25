@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -9,7 +9,7 @@ export const useTasks = () => {
   const { user } = useAuth();
 
   // Fetch user-specific tasks
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     if (!user) {
       setTasks([]);
       setLoading(false);
@@ -33,7 +33,7 @@ export const useTasks = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   // Add a new task
   const addTask = async (taskData) => {
@@ -156,7 +156,7 @@ export const useTasks = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [user]);
+  }, [user, fetchTasks]);
 
   return {
     tasks,
