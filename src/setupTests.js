@@ -10,8 +10,6 @@ process.env.REACT_APP_SUPABASE_ANON_KEY = 'test-anon-key';
 
 // Mock IntersectionObserver for components that might use it
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  
   observe() {
     return null;
   }
@@ -27,8 +25,6 @@ global.IntersectionObserver = class IntersectionObserver {
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  
   observe() {
     return null;
   }

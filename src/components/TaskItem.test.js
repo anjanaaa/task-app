@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import TaskItem from './TaskItem';
 
 describe('TaskItem Component', () => {
@@ -50,7 +49,7 @@ describe('TaskItem Component', () => {
     const checkbox = screen.getByRole('checkbox');
     expect(checkbox).not.toBeChecked();
     
-    const taskItem = screen.getByText('Test Task').closest('.task-item');
+    const taskItem = screen.getByText('Test Task').parentElement.parentElement.parentElement;
     expect(taskItem).not.toHaveClass('completed');
   });
 
@@ -69,7 +68,7 @@ describe('TaskItem Component', () => {
     const checkbox = screen.getByRole('checkbox');
     expect(checkbox).toBeChecked();
     
-    const taskItem = screen.getByText('Test Task').closest('.task-item');
+    const taskItem = screen.getByText('Test Task').parentElement.parentElement.parentElement;
     expect(taskItem).toHaveClass('completed');
   });
 
@@ -143,7 +142,7 @@ describe('TaskItem Component', () => {
     expect(screen.getByText(/Time expired!/)).toBeInTheDocument();
     expect(screen.getByText(/⏰/)).toBeInTheDocument();
     
-    const taskItem = screen.getByText('Test Task').closest('.task-item');
+    const taskItem = screen.getByText('Test Task').parentElement.parentElement.parentElement;
     expect(taskItem).toHaveClass('expired');
   });
 
@@ -246,7 +245,7 @@ describe('TaskItem Component', () => {
       />
     );
     
-    const taskItem = screen.getByText('Test Task').closest('.task-item');
+    const taskItem = screen.getByText('Test Task').parentElement.parentElement.parentElement;
     expect(taskItem).toHaveClass('expired');
   });
 
@@ -267,7 +266,7 @@ describe('TaskItem Component', () => {
       />
     );
     
-    const taskItem = screen.getByText('Test Task').closest('.task-item');
+    const taskItem = screen.getByText('Test Task').parentElement.parentElement.parentElement;
     expect(taskItem).toHaveClass('completed');
     expect(taskItem).toHaveClass('expired');
   });
@@ -290,7 +289,7 @@ describe('TaskItem Component', () => {
     
     expect(screen.getByText(/Time expired!/)).toBeInTheDocument();
     
-    const taskItem = screen.getByText('Test Task').closest('.task-item');
+    const taskItem = screen.getByText('Test Task').parentElement.parentElement.parentElement;
     expect(taskItem).toHaveClass('expired');
   });
 });

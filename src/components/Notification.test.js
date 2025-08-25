@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Notification from './Notification';
 
 describe('Notification Component', () => {
@@ -69,8 +69,8 @@ describe('Notification Component', () => {
       />
     );
     
-    notification = screen.getByText('Expired message').closest('.notification');
-    expect(notification).toHaveClass('notification-expired');
+    const expiredNotification = screen.getByText('Expired message').parentElement.parentElement;
+    expect(expiredNotification).toHaveClass('notification-expired');
   });
 
   test('calls onClose when close button is clicked', () => {
@@ -112,7 +112,8 @@ describe('Notification Component', () => {
     
     // Error notifications should render correctly
     expect(screen.getByText('Error message')).toBeInTheDocument();
-    expect(screen.getByText('Error message').closest('.notification')).toHaveClass('notification-error');
+    const notification = screen.getByText('Error message').parentElement.parentElement;
+    expect(notification).toHaveClass('notification-error');
   });
 
   test('renders expired notifications without auto-dismiss', () => {
@@ -126,7 +127,8 @@ describe('Notification Component', () => {
     
     // Expired notifications should render correctly
     expect(screen.getByText('Expired message')).toBeInTheDocument();
-    expect(screen.getByText('Expired message').closest('.notification')).toHaveClass('notification-expired');
+    const notification = screen.getByText('Expired message').parentElement.parentElement;
+    expect(notification).toHaveClass('notification-expired');
   });
 
   test('clears timeout when component unmounts', () => {
@@ -230,7 +232,8 @@ describe('Notification Component', () => {
     );
     
     expect(screen.getByText('Success message')).toBeInTheDocument();
-    expect(screen.getByText('Success message').closest('.notification')).toHaveClass('notification-success');
+    const notification = screen.getByText('Success message').parentElement.parentElement;
+    expect(notification).toHaveClass('notification-success');
   });
 
   test('renders info notifications correctly', () => {
@@ -243,6 +246,7 @@ describe('Notification Component', () => {
     );
     
     expect(screen.getByText('Info message')).toBeInTheDocument();
-    expect(screen.getByText('Info message').closest('.notification')).toHaveClass('notification-info');
+    const notification = screen.getByText('Info message').parentElement.parentElement;
+    expect(notification).toHaveClass('notification-info');
   });
 });

@@ -1,6 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent } from '@testing-library/react';
 import TaskForm from './TaskForm';
 
 describe('TaskForm Component', () => {
@@ -150,7 +149,7 @@ describe('TaskForm Component', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
-    const form = titleInput.closest('form');
+    const form = titleInput.parentElement.parentElement;
     
     fireEvent.change(titleInput, { target: { value: 'Test task' } });
     fireEvent.submit(form);
