@@ -3,44 +3,58 @@ import './App.css';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import Notification from './components/Notification';
+import { useTasks } from './hooks/useTasks';
 
 function App() {
-  const [tasks, setTasks] = useState([]);
+  const { 
+    tasks, 
+    loading, 
+    error, 
+    addTask: addTaskToDb, 
+    toggleTask: toggleTaskInDb, 
+    deleteTask: deleteTaskFromDb,
+    markTaskExpired 
+  } = useTasks();
+  
   const [expiredTasks, setExpiredTasks] = useState(new Set());
   const [notifications, setNotifications] = useState([]);
 
-  const addTask = (taskData) => {
-    const newTask = {
-      id: Date.now(),
-      title: taskData.title,
-      timeLimit: taskData.timeLimit ? new Date(Date.now() + taskData.timeLimit * 60 * 1000) : null,
-      createdAt: new Date(),
-      completed: false,
-      hasExpired: false
-    };
-    setTasks([...tasks, newTask]);
+  const addTask = async (taskData) => {
+    try {
+      await addTaskToDb(taskData);
+      addNotification(`Task "${taskData.title}" added successfully!`, 'success');
+    } catch (err) {
+      addNotification(`Error adding task: ${err.message}`, 'error');
+    }
   };
 
-  const toggleTask = (id) => {
+  const toggleTask = async (id) => {
     const task = tasks.find(t => t.id === id);
     if (task && !task.completed) {
       // Task is being completed
       addNotification(`Great job! You completed "${task.title}"`, 'success');
     }
     
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+    try {
+      await toggleTaskInDb(id);
+    } catch (err) {
+      addNotification(`Error updating task: ${err.message}`, 'error');
+    }
   };
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
-    // Remove from expired tasks set when deleted
-    setExpiredTasks(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(id);
-      return newSet;
-    });
+  const deleteTask = async (id) => {
+    try {
+      await deleteTaskFromDb(id);
+      // Remove from expired tasks set when deleted
+      setExpiredTasks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+      addNotification('Task deleted successfully!', 'success');
+    } catch (err) {
+      addNotification(`Error deleting task: ${err.message}`, 'error');
+    }
   };
 
   const addNotification = (message, type = 'info') => {
@@ -56,7 +70,7 @@ function App() {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  const handleTaskExpired = useCallback((taskId, taskTitle) => {
+  const handleTaskExpired = useCallback(async (taskId, taskTitle) => {
     // Only alert if this task hasn't expired before and isn't completed
     const task = tasks.find(t => t.id === taskId);
     if (!expiredTasks.has(taskId) && task && !task.completed) {
@@ -68,20 +82,22 @@ function App() {
       // Also show browser alert as backup
       alert(`⏰ Time's up! Your task "${taskTitle}" has expired.`);
       
-      // Mark task as expired in state
-      setTasks(prev => prev.map(t => 
-        t.id === taskId ? { ...t, hasExpired: true } : t
-      ));
+      // Mark task as expired in database
+      try {
+        await markTaskExpired(taskId);
+      } catch (err) {
+        console.error('Error marking task as expired:', err);
+      }
     }
-  }, [tasks, expiredTasks]);
+  }, [tasks, expiredTasks, markTaskExpired]);
 
   // Check for expired tasks periodically
   useEffect(() => {
     const checkExpired = () => {
       const now = new Date();
       tasks.forEach(task => {
-        if (task.timeLimit && !task.completed && !task.hasExpired) {
-          if (now >= new Date(task.timeLimit)) {
+        if (task.time_limit && !task.completed && !task.has_expired) {
+          if (now >= new Date(task.time_limit)) {
             handleTaskExpired(task.id, task.title);
           }
         }
@@ -91,6 +107,29 @@ function App() {
     const interval = setInterval(checkExpired, 1000);
     return () => clearInterval(interval);
   }, [tasks, expiredTasks, handleTaskExpired]);
+
+  if (loading) {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1>Tasks Manager</h1>
+          <p>Loading your tasks...</p>
+        </header>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1>Tasks Manager</h1>
+          <p style={{ color: 'red' }}>Error: {error}</p>
+          <p>Please check your Supabase configuration.</p>
+        </header>
+      </div>
+    );
+  }
 
   return (
     <div className="App">

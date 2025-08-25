@@ -30,10 +30,10 @@ const TaskItem = ({ task, currentTime, onToggle, onDelete }) => {
     return new Date(createdAt).toLocaleString();
   };
 
-  const timeRemaining = formatTimeRemaining(task.timeLimit, currentTime);
+  const timeRemaining = formatTimeRemaining(task.time_limit, currentTime);
 
   return (
-    <div className={`task-item ${task.completed ? 'completed' : ''} ${timeRemaining?.isExpired || task.hasExpired ? 'expired' : ''}`}>
+    <div className={`task-item ${task.completed ? 'completed' : ''} ${timeRemaining?.isExpired || task.has_expired ? 'expired' : ''}`}>
       <div className="task-content">
         <div className="task-header">
           <label className="task-checkbox">
@@ -49,8 +49,8 @@ const TaskItem = ({ task, currentTime, onToggle, onDelete }) => {
         
         <div className="task-meta">
           <div className="task-info">
-            <span className="created-time">Created: {formatCreatedTime(task.createdAt)}</span>
-            {task.timeLimit && (
+            <span className="created-time">Created: {formatCreatedTime(task.created_at)}</span>
+            {task.time_limit && (
               <span className={`time-limit ${timeRemaining?.isExpired ? 'expired' : ''}`}>
                 {timeRemaining?.isExpired ? (
                   <span className="expired-text">⏰ {timeRemaining.text}</span>
