@@ -20,65 +20,60 @@ describe('TaskForm Component', () => {
     expect(screen.getByRole('button', { name: 'Add Task' })).toBeInTheDocument();
   });
 
-  test('allows typing in task title input', async () => {
-    const user = userEvent.setup();
+  test('allows typing in task title input', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
-    await user.type(titleInput, 'New test task');
+    fireEvent.change(titleInput, { target: { value: 'New test task' } });
     
     expect(titleInput).toHaveValue('New test task');
   });
 
-  test('shows time limit input when checkbox is checked', async () => {
-    const user = userEvent.setup();
+  test('shows time limit input when checkbox is checked', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const checkbox = screen.getByLabelText('Add time limit');
-    await user.click(checkbox);
+    fireEvent.click(checkbox);
     
     expect(screen.getByLabelText('Time Limit (minutes):')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter time in minutes...')).toBeInTheDocument();
   });
 
-  test('hides time limit input when checkbox is unchecked', async () => {
-    const user = userEvent.setup();
+  test('hides time limit input when checkbox is unchecked', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const checkbox = screen.getByLabelText('Add time limit');
     
     // Check and then uncheck
-    await user.click(checkbox);
+    fireEvent.click(checkbox);
     expect(screen.getByLabelText('Time Limit (minutes):')).toBeInTheDocument();
     
-    await user.click(checkbox);
+    fireEvent.click(checkbox);
     expect(screen.queryByLabelText('Time Limit (minutes):')).not.toBeInTheDocument();
   });
 
-  test('allows typing in time limit input', async () => {
-    const user = userEvent.setup();
+  test('allows typing in time limit input', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     // Enable time limit
     const checkbox = screen.getByLabelText('Add time limit');
-    await user.click(checkbox);
+    fireEvent.click(checkbox);
     
     // Type in time limit
     const timeInput = screen.getByPlaceholderText('Enter time in minutes...');
-    await user.type(timeInput, '30');
+    fireEvent.change(timeInput, { target: { value: '30' } });
     
     expect(timeInput).toHaveValue(30);
   });
 
-  test('submits form with task title only', async () => {
-    const user = userEvent.setup();
+  test('submits form with task title only', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
     const submitButton = screen.getByRole('button', { name: 'Add Task' });
     
-    await user.type(titleInput, 'Test task');
-    await user.click(submitButton);
+    fireEvent.change(titleInput, { target: { value: 'Test task' } });
+    fireEvent.click(submitButton);
     
     expect(mockOnAddTask).toHaveBeenCalledWith({
       title: 'Test task',
@@ -86,21 +81,20 @@ describe('TaskForm Component', () => {
     });
   });
 
-  test('submits form with task title and time limit', async () => {
-    const user = userEvent.setup();
+  test('submits form with task title and time limit', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
     const checkbox = screen.getByLabelText('Add time limit');
     const submitButton = screen.getByRole('button', { name: 'Add Task' });
     
-    await user.type(titleInput, 'Timed task');
-    await user.click(checkbox);
+    fireEvent.change(titleInput, { target: { value: 'Timed task' } });
+    fireEvent.click(checkbox);
     
     const timeInput = screen.getByPlaceholderText('Enter time in minutes...');
-    await user.type(timeInput, '45');
+    fireEvent.change(timeInput, { target: { value: '45' } });
     
-    await user.click(submitButton);
+    fireEvent.click(submitButton);
     
     expect(mockOnAddTask).toHaveBeenCalledWith({
       title: 'Timed task',
@@ -108,31 +102,28 @@ describe('TaskForm Component', () => {
     });
   });
 
-  test('does not submit with empty title', async () => {
-    const user = userEvent.setup();
+  test('does not submit with empty title', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const submitButton = screen.getByRole('button', { name: 'Add Task' });
-    await user.click(submitButton);
+    fireEvent.click(submitButton);
     
     expect(mockOnAddTask).not.toHaveBeenCalled();
   });
 
-  test('does not submit with whitespace-only title', async () => {
-    const user = userEvent.setup();
+  test('does not submit with whitespace-only title', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
     const submitButton = screen.getByRole('button', { name: 'Add Task' });
     
-    await user.type(titleInput, '   ');
-    await user.click(submitButton);
+    fireEvent.change(titleInput, { target: { value: '   ' } });
+    fireEvent.click(submitButton);
     
     expect(mockOnAddTask).not.toHaveBeenCalled();
   });
 
-  test('clears form after successful submission', async () => {
-    const user = userEvent.setup();
+  test('clears form after successful submission', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
@@ -140,14 +131,14 @@ describe('TaskForm Component', () => {
     const submitButton = screen.getByRole('button', { name: 'Add Task' });
     
     // Fill form
-    await user.type(titleInput, 'Test task');
-    await user.click(checkbox);
+    fireEvent.change(titleInput, { target: { value: 'Test task' } });
+    fireEvent.click(checkbox);
     
     const timeInput = screen.getByPlaceholderText('Enter time in minutes...');
-    await user.type(timeInput, '30');
+    fireEvent.change(timeInput, { target: { value: '30' } });
     
     // Submit
-    await user.click(submitButton);
+    fireEvent.click(submitButton);
     
     // Check form is cleared
     expect(titleInput).toHaveValue('');
@@ -155,13 +146,14 @@ describe('TaskForm Component', () => {
     expect(screen.queryByPlaceholderText('Enter time in minutes...')).not.toBeInTheDocument();
   });
 
-  test('submits form on Enter key press', async () => {
-    const user = userEvent.setup();
+  test('submits form on Enter key press', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
+    const form = titleInput.closest('form');
     
-    await user.type(titleInput, 'Test task{enter}');
+    fireEvent.change(titleInput, { target: { value: 'Test task' } });
+    fireEvent.submit(form);
     
     expect(mockOnAddTask).toHaveBeenCalledWith({
       title: 'Test task',
@@ -169,18 +161,17 @@ describe('TaskForm Component', () => {
     });
   });
 
-  test('handles time limit checkbox with no time value', async () => {
-    const user = userEvent.setup();
+  test('handles time limit checkbox with no time value', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
     const checkbox = screen.getByLabelText('Add time limit');
     const submitButton = screen.getByRole('button', { name: 'Add Task' });
     
-    await user.type(titleInput, 'Test task');
-    await user.click(checkbox);
+    fireEvent.change(titleInput, { target: { value: 'Test task' } });
+    fireEvent.click(checkbox);
     // Don't enter time limit value
-    await user.click(submitButton);
+    fireEvent.click(submitButton);
     
     expect(mockOnAddTask).toHaveBeenCalledWith({
       title: 'Test task',
@@ -188,15 +179,14 @@ describe('TaskForm Component', () => {
     });
   });
 
-  test('trims whitespace from task title', async () => {
-    const user = userEvent.setup();
+  test('trims whitespace from task title', () => {
     render(<TaskForm onAddTask={mockOnAddTask} />);
     
     const titleInput = screen.getByPlaceholderText('Enter your task...');
     const submitButton = screen.getByRole('button', { name: 'Add Task' });
     
-    await user.type(titleInput, '  Trimmed task  ');
-    await user.click(submitButton);
+    fireEvent.change(titleInput, { target: { value: '  Trimmed task  ' } });
+    fireEvent.click(submitButton);
     
     expect(mockOnAddTask).toHaveBeenCalledWith({
       title: 'Trimmed task',

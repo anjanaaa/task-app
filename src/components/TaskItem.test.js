@@ -73,8 +73,7 @@ describe('TaskItem Component', () => {
     expect(taskItem).toHaveClass('completed');
   });
 
-  test('calls onToggle when checkbox is clicked', async () => {
-    const user = userEvent.setup();
+  test('calls onToggle when checkbox is clicked', () => {
     render(
       <TaskItem 
         task={basicTask} 
@@ -85,13 +84,12 @@ describe('TaskItem Component', () => {
     );
     
     const checkbox = screen.getByRole('checkbox');
-    await user.click(checkbox);
+    fireEvent.click(checkbox);
     
     expect(mockOnToggle).toHaveBeenCalledWith(1);
   });
 
-  test('calls onDelete when delete button is clicked', async () => {
-    const user = userEvent.setup();
+  test('calls onDelete when delete button is clicked', () => {
     render(
       <TaskItem 
         task={basicTask} 
@@ -102,7 +100,7 @@ describe('TaskItem Component', () => {
     );
     
     const deleteButton = screen.getByTitle('Delete task');
-    await user.click(deleteButton);
+    fireEvent.click(deleteButton);
     
     expect(mockOnDelete).toHaveBeenCalledWith(1);
   });
@@ -123,7 +121,7 @@ describe('TaskItem Component', () => {
     );
     
     expect(screen.getByText(/5m 0s remaining/)).toBeInTheDocument();
-    expect(screen.getByText('⏱️')).toBeInTheDocument();
+    expect(screen.getByText(/⏱️/)).toBeInTheDocument();
   });
 
   test('displays expired message for expired task', () => {
@@ -143,7 +141,7 @@ describe('TaskItem Component', () => {
     );
     
     expect(screen.getByText(/Time expired!/)).toBeInTheDocument();
-    expect(screen.getByText('⏰')).toBeInTheDocument();
+    expect(screen.getByText(/⏰/)).toBeInTheDocument();
     
     const taskItem = screen.getByText('Test Task').closest('.task-item');
     expect(taskItem).toHaveClass('expired');

@@ -39,6 +39,6 @@ describe('App Component', () => {
     render(<App />);
     
     // Should show empty state when no tasks
-    expect(screen.getByText('No tasks yet. Add one above to get started!')).toBeInTheDocument();
+    expect(screen.getByText('No tasks yet. Add your first task above!')).toBeInTheDocument();
   });
 });

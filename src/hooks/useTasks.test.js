@@ -1,48 +1,37 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTasks } from './useTasks';
 
-// Mock Supabase client
-const mockSupabase = {
-  from: jest.fn(() => mockSupabase),
-  select: jest.fn(() => mockSupabase),
-  insert: jest.fn(() => mockSupabase),
-  update: jest.fn(() => mockSupabase),
-  delete: jest.fn(() => mockSupabase),
-  eq: jest.fn(() => mockSupabase),
-  order: jest.fn(() => mockSupabase),
-  single: jest.fn(() => mockSupabase),
-  channel: jest.fn(() => mockChannel),
-};
+jest.mock('../lib/supabase', () => {
+  const mockSubscription = {
+    unsubscribe: jest.fn(),
+  };
 
-const mockChannel = {
-  on: jest.fn(() => mockChannel),
-  subscribe: jest.fn(() => mockSubscription),
-};
+  const mockChannel = {
+    on: jest.fn(() => mockChannel),
+    subscribe: jest.fn(() => mockSubscription),
+  };
 
-const mockSubscription = {
-  unsubscribe: jest.fn(),
-};
+  const mockSupabase = {
+    from: jest.fn(() => mockSupabase),
+    select: jest.fn(() => mockSupabase),
+    insert: jest.fn(() => mockSupabase),
+    update: jest.fn(() => mockSupabase),
+    delete: jest.fn(() => mockSupabase),
+    eq: jest.fn(() => mockSupabase),
+    order: jest.fn(() => mockSupabase),
+    single: jest.fn(() => mockSupabase),
+    channel: jest.fn(() => mockChannel),
+  };
 
-jest.mock('../lib/supabase', () => ({
-  supabase: mockSupabase
-}));
+  return { supabase: mockSupabase };
+});
 
 describe('useTasks Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Reset all mock implementations
-    mockSupabase.from.mockReturnValue(mockSupabase);
-    mockSupabase.select.mockReturnValue(mockSupabase);
-    mockSupabase.insert.mockReturnValue(mockSupabase);
-    mockSupabase.update.mockReturnValue(mockSupabase);
-    mockSupabase.delete.mockReturnValue(mockSupabase);
-    mockSupabase.eq.mockReturnValue(mockSupabase);
-    mockSupabase.order.mockReturnValue(mockSupabase);
-    mockSupabase.single.mockReturnValue(mockSupabase);
-    mockSupabase.channel.mockReturnValue(mockChannel);
-    mockChannel.on.mockReturnValue(mockChannel);
-    mockChannel.subscribe.mockReturnValue(mockSubscription);
+
+
   });
 
   test('initializes with empty tasks and loading state', () => {

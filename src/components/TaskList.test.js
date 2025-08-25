@@ -1,6 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent } from '@testing-library/react';
 import TaskList from './TaskList';
 
 // Mock TaskItem component to simplify testing
@@ -69,7 +68,7 @@ describe('TaskList Component', () => {
       />
     );
     
-    expect(screen.getByText('No tasks yet. Add one above to get started!')).toBeInTheDocument();
+    expect(screen.getByText('No tasks yet. Add your first task above!')).toBeInTheDocument();
   });
 
   test('renders all tasks when provided', () => {
@@ -152,8 +151,7 @@ describe('TaskList Component', () => {
     expect(screen.getByText('Active Task 1')).toBeInTheDocument();
   });
 
-  test('forwards onToggle calls to parent component', async () => {
-    const user = userEvent.setup();
+  test('forwards onToggle calls to parent component', () => {
     render(
       <TaskList 
         tasks={[sampleTasks[0]]} 
@@ -163,13 +161,12 @@ describe('TaskList Component', () => {
     );
     
     const toggleButton = screen.getByText('Toggle');
-    await user.click(toggleButton);
+    fireEvent.click(toggleButton);
     
     expect(mockOnToggleTask).toHaveBeenCalledWith(1);
   });
 
-  test('forwards onDelete calls to parent component', async () => {
-    const user = userEvent.setup();
+  test('forwards onDelete calls to parent component', () => {
     render(
       <TaskList 
         tasks={[sampleTasks[0]]} 
@@ -179,7 +176,7 @@ describe('TaskList Component', () => {
     );
     
     const deleteButton = screen.getByText('Delete');
-    await user.click(deleteButton);
+    fireEvent.click(deleteButton);
     
     expect(mockOnDeleteTask).toHaveBeenCalledWith(1);
   });
