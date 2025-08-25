@@ -16,7 +16,16 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:ci": "CI=true react-scripts test --coverage --watchAll=false",
+    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint src/ --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write src/**/*.{js,jsx,ts,tsx,json,css,md}",
+    "format:check": "prettier --check src/**/*.{js,jsx,ts,tsx,json,css,md}",
+    "analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
+    "serve": "npm run build && npx serve -s build",
+    "lighthouse": "lhci autorun"
   },
   "eslintConfig": {
     "extends": [
@@ -35,5 +44,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.12.0",
+    "prettier": "^3.0.0",
+    "source-map-explorer": "^2.5.3",
+    "audit-ci": "^6.6.1"
+  },
+  "homepage": "https://anjanaaa.github.io/task-app"
 }
