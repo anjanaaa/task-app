@@ -41,6 +41,9 @@ export const AuthProvider = ({ children }) => {
       // Use the current origin for redirect, which will work for both localhost and production
       const redirectUrl = window.location.origin;
       
+      console.log('🔍 Debug: Current origin:', window.location.origin);
+      console.log('🔍 Debug: Redirect URL:', redirectUrl);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
