@@ -15,6 +15,15 @@ jest.mock('./hooks/useTasks', () => ({
   })
 }));
 
+// Mock the useAuth hook to simulate an authenticated user
+jest.mock('./contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user-id', email: 'test@example.com' },
+    loading: false,
+    signOut: jest.fn()
+  })
+}));
+
 describe('App Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
