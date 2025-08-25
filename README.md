@@ -1,16 +1,29 @@
 # React Tasks App
 
-A modern React application for managing tasks with optional time limits and real-time countdown functionality.
+![CI/CD Pipeline](https://github.com/anjanaaa/task-app/actions/workflows/ci-cd.yml/badge.svg)
+![GitHub Pages](https://img.shields.io/badge/deployment-GitHub%20Pages-brightgreen)
+![React](https://img.shields.io/badge/React-18.2.0-blue)
+![Supabase](https://img.shields.io/badge/Database-Supabase-green)
 
-## Features
+A modern React application for managing tasks with optional time limits, real-time countdown functionality, and cloud persistence.
 
-- ✅ Add tasks with descriptive titles
-- ⏰ Optional time limits for tasks (in minutes)
-- 🕐 Real-time countdown showing remaining time
-- ✔️ Mark tasks as completed
-- 🗑️ Delete tasks
-- 📱 Responsive design
-- 🎨 Modern UI with gradient background and glass morphism effects
+## 🌐 Live Demo
+
+**Deployed App**: [https://anjanaaa.github.io/task-app](https://anjanaaa.github.io/task-app)
+
+> **Note**: The live demo uses GitHub Pages. For full functionality with data persistence, you'll need to set up your own Supabase instance (see setup guide below).
+
+## ✨ Features
+
+- ✅ **Task Management**: Add, complete, and delete tasks
+- ⏰ **Time Limits**: Optional countdown timers for tasks
+- 🕐 **Real-time Updates**: Live countdown and instant synchronization
+- 💾 **Cloud Persistence**: Tasks saved to Supabase database
+- 🔄 **Multi-device Sync**: Real-time updates across all devices
+- 📱 **Responsive Design**: Works on desktop and mobile
+- 🎨 **Modern UI**: Glass morphism effects and gradient backgrounds
+- 🚀 **Auto-deploy**: CI/CD pipeline with GitHub Actions
+- 🔒 **Security**: Automated vulnerability scanning
 
 ## Getting Started
 
@@ -61,20 +74,58 @@ npm start
 - Adaptive layout for different screen sizes
 - Modern glassmorphism design with gradient backgrounds
 
-## Available Scripts
+## 🔧 Available Scripts
 
+### Development
 - `npm start` - Runs the app in development mode
 - `npm test` - Launches the test runner
 - `npm run build` - Builds the app for production
-- `npm run eject` - Ejects from Create React App (one-way operation)
 
-## Technology Stack
+### Code Quality
+- `npm run lint` - Check code with ESLint
+- `npm run lint:fix` - Fix ESLint issues automatically  
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check if code is formatted
 
-- React 18
-- Modern CSS with Flexbox and Grid
-- Responsive design principles
-- Real-time updates with setInterval
+### Testing & Performance
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run lighthouse` - Run Lighthouse performance tests
+- `npm run analyze` - Analyze bundle size
 
-## Browser Support
+### Production
+- `npm run serve` - Serve production build locally
 
-This app works in all modern browsers that support ES6+ features.
+## 🛠️ Technology Stack
+
+- **Frontend**: React 18.2, Modern CSS, Responsive Design
+- **Backend**: Supabase (PostgreSQL, Real-time subscriptions)
+- **CI/CD**: GitHub Actions (Build, Test, Deploy, Security)
+- **Deployment**: GitHub Pages
+- **Tools**: ESLint, Prettier, Lighthouse CI
+- **Testing**: Jest, React Testing Library
+
+## 📁 Project Structure
+
+```
+task-app/
+├── .github/workflows/     # CI/CD pipelines
+├── public/               # Static assets
+├── src/
+│   ├── components/       # React components
+│   ├── hooks/           # Custom hooks (useTasks)
+│   ├── lib/             # Supabase client
+│   └── ...
+├── database-schema.sql   # Database setup
+├── SUPABASE_SETUP.md    # Database setup guide
+├── CICD_SETUP.md        # Pipeline setup guide
+└── lighthouserc.js      # Performance testing config
+```
+
+## 🚀 Setup Guides
+
+- **[Supabase Setup](./SUPABASE_SETUP.md)** - Database configuration
+- **[CI/CD Setup](./CICD_SETUP.md)** - Pipeline configuration
+
+## 🌐 Browser Support
+
+This app works in all modern browsers that support ES6+ features and WebSocket connections.
