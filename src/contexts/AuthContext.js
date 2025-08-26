@@ -38,11 +38,12 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithGoogle = async () => {
     try {
-      // Use the current origin for redirect, which will work for both localhost and production
-      const redirectUrl = window.location.origin;
+      // For GitHub Pages, we need the full URL including the repository path
+      const redirectUrl = window.location.href.split('?')[0]; // Remove query parameters
       
       console.log('🚨 TEST LOG - This should appear when button is clicked!');
       console.log('🔍 Debug: window.location.origin:', window.location.origin);
+      console.log('🔍 Debug: window.location.href:', window.location.href);
       console.log('🔍 Debug: Redirect URL:', redirectUrl);
       
       const { error } = await supabase.auth.signInWithOAuth({
