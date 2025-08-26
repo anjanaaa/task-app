@@ -18,9 +18,21 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setLoading(false);
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.log('Session error, clearing user:', error.message);
+          setUser(null);
+        } else {
+          setUser(session?.user ?? null);
+        }
+      } catch (error) {
+        console.log('Failed to get session, clearing user:', error.message);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getSession();
@@ -28,6 +40,7 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         setUser(session?.user ?? null);
         setLoading(false);
       }
@@ -39,12 +52,14 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       // For GitHub Pages, we need the full URL including the repository path
-      const redirectUrl = window.location.href.split('?')[0]; // Remove query parameters
+      // Remove both query parameters and URL fragments (#)
+      const redirectUrl = window.location.href.split('?')[0].split('#')[0];
       
       console.log('🚨 TEST LOG - This should appear when button is clicked!');
       console.log('🔍 Debug: window.location.origin:', window.location.origin);
       console.log('🔍 Debug: window.location.href:', window.location.href);
-      console.log('🔍 Debug: Redirect URL:', redirectUrl);
+      console.log('🔍 Debug: window.location.hash:', window.location.hash);
+      console.log('🔍 Debug: Redirect URL (cleaned):', redirectUrl);
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -52,7 +67,10 @@ export const AuthProvider = ({ children }) => {
           redirectTo: redirectUrl
         }
       });
-      if (error) throw error;
+      if (error) {
+        console.error('OAuth sign-in error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error signing in with Google:', error.message);
       throw error;
@@ -61,11 +79,41 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     try {
+      // Always try to sign out, but handle errors gracefully
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      
+      if (error) {
+        // If it's a session not found error, just clear the local state
+        if (error.message.includes('session not found') || error.message.includes('403')) {
+          console.log('Session already expired, clearing local state');
+        } else {
+          console.error('Sign out error:', error.message);
+        }
+      }
+      
+      // Always clear local state regardless of server response
+      setUser(null);
+      
     } catch (error) {
-      console.error('Error signing out:', error.message);
-      throw error;
+      console.error('Error during sign out:', error.message);
+      // Even if there's an error, clear the local state
+      setUser(null);
+    }
+  };
+
+  const refreshSession = async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.refreshSession();
+      
+      if (error) {
+        console.log('Failed to refresh session:', error.message);
+        setUser(null);
+      } else {
+        setUser(session?.user ?? null);
+      }
+    } catch (error) {
+      console.log('Error refreshing session:', error.message);
+      setUser(null);
     }
   };
 
@@ -74,6 +122,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     signInWithGoogle,
     signOut,
+    refreshSession,
     isAuthenticated: !!user
   };
 
